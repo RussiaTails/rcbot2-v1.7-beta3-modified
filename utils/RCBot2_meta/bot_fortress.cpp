@@ -7518,6 +7518,10 @@ bool CBotTF2 :: isEnemy ( edict_t *pEdict,bool bCheckWeapons )
 	static bool bIsBoss;
 	static bool bIsGrenade;
 
+	const string_t mapname = gpGlobals->mapname;
+
+	const char* szmapname = mapname.ToCStr();
+
 	bIsPipeBomb = false;
 	bIsRocket = false;
 	bValid = false;
@@ -7686,7 +7690,15 @@ bool CBotTF2 :: isEnemy ( edict_t *pEdict,bool bCheckWeapons )
 		}
 	}
 	// TODO: to allow bots to properly attack RD Robots [APG]RoboCop[CL]
-	else if ( CTeamFortress2Mod::isMapType(TF_MAP_RD) && !std::strcmp(pEdict->GetClassName(),"tf_robot_destruction_robot") && (CClassInterface::getTeam(pEdict) != m_iTeam) )
+	else if ( (CTeamFortress2Mod::isMapType(TF_MAP_RD) || CTeamFortress2Mod::isMapType(TF_MAP_CTF)) && !std::strcmp(pEdict->GetClassName(),"tf_robot_destruction_robot") && (CClassInterface::getTeam(pEdict) != m_iTeam) && (!CTF2Conditions::TF2_IsPlayerInCondition(engine->IndexOfEdict(pEdict), TFCond_Ubercharged)))
+	{
+		bValid = true;
+	}
+	else if (!std::strcmp(pEdict->GetClassName(), "tf_zombie") && (CClassInterface::getTeam(pEdict) != m_iTeam))
+	{
+		bValid = true;
+	}
+	else if ((std::strncmp(szmapname, "koth_bound_event_rc3a", 21) == 0) && !std::strcmp(pEdict->GetClassName(), "func_breakable") && (CClassInterface::getTeam(pEdict) != m_iTeam))
 	{
 		bValid = true;
 	}
